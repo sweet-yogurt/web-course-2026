@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo-лист · Лабораторная №3</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1 class="app-title">
+        <span class="title-bracket">[</span>
+        Todo-лист
+        <span class="title-bracket">]</span>
+      </h1>
+    </header>
+
+    <section class="input-section">
+      <div class="input-row">
+        <input type="text" id="taskInput" placeholder="Буханка молока, литр хлеба..." autocomplete="off">
+        <button id="addBtn">Добавить</button>
+      </div>
+      <div class="warning-message" id="warningMsg"></div>
+    </section>
+
+    <section class="controls-section">
+      <div class="counter" id="counter">Осталось: 0, Выполнено: 0</div>
+      <div class="filters" id="filters">
+        <button class="filter-btn active" data-filter="all">Все</button>
+        <button class="filter-btn" data-filter="active">Активные</button>
+        <button class="filter-btn" data-filter="completed">Завершённые</button>
+        <span class="filter-indicator" id="filterIndicator"></span>
+      </div>
+    </section>
+
+    <section class="list-section">
+      <ul class="todo-list" id="todoList"></ul>
+    </section>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
