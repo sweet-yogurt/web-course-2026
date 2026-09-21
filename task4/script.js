@@ -20,13 +20,13 @@ const closeModalBtn = document.getElementById('closeModalBtn');
 
 function generateSecretNumber() {
   const digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-  // Перемешивание Фишера–Йетса
   for (let i = digits.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [digits[i], digits[j]] = [digits[j], digits[i]];
   }
   return digits.slice(0, 4).join('');
 }
+
 
 function isValidGuess(input) {
   if (!/^\d+$/.test(input)) return false;
