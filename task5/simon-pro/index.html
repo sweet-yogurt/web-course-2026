@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simon — Симон говорит</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="game">
+    <header class="game__header">
+      <h1 class="game__title">Simon</h1>
+      <p class="game__subtitle" id="subtitle" title="…">Симон говорит</p>
+      <p class="game__easter" id="easterEgg" aria-live="polite"></p>
+    </header>
+
+    <div class="hud">
+      <div class="hud__item">
+        <span class="hud__label">Уровень</span>
+        <span class="hud__value" id="level">0</span>
+      </div>
+      <div class="hud__item">
+        <span class="hud__label">Режим</span>
+        <span class="hud__value hud__value--status" id="modeLabel">Запоминание</span>
+      </div>
+      <div class="hud__item">
+        <span class="hud__label">Статус</span>
+        <span class="hud__value hud__value--status" id="status">Готовы?</span>
+      </div>
+    </div>
+
+    <div class="board-wrap" id="boardWrap">
+      <div class="board" id="board" aria-label="Игровое поле Simon">
+        <div class="board__center" aria-hidden="true">
+          <span class="board__center-text">Simon</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn--start" id="startBtn" type="button">Старт</button>
+
+      <p class="hint">
+        <span class="keygrid" id="keygrid" aria-label="Раскладка управления"></span>
+        — секторы,&nbsp; <kbd>Enter</kbd> — старт.
+      </p>
+    </div>
+
+    <p class="message" id="message" role="status" aria-live="polite"></p>
+  </main>
+
+  <button class="settings-btn" id="settingsBtn" type="button" aria-label="Настройки" title="Настройки">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <path fill="currentColor" d="M19.14 12.94a7.07 7.07 0 0 0 .05-.94 7.07 7.07 0 0 0-.05-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.03 7.03 0 0 0-1.63-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.59.24-1.13.56-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.7 8.84a.5.5 0 0 0 .12.64l2.03 1.58a7.07 7.07 0 0 0-.05.94c0 .32.02.63.05.94L2.82 14.52a.5.5 0 0 0-.12.64l1.92 3.32c.13.22.39.3.6.22l2.39-.96c.5.38 1.04.7 1.63.94l.36 2.54c.04.24.25.42.5.42h3.84c.25 0 .46-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.63-.94l2.39.96c.22.08.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2Z"/>
+    </svg>
+  </button>
+
+  <div class="modal" id="settingsModal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <header class="modal__header">
+        <h2 class="modal__title" id="settingsTitle">Настройки</h2>
+        <button class="modal__close" type="button" data-close aria-label="Закрыть">×</button>
+      </header>
+
+      <div class="modal__body">
+        <section class="setting">
+          <h3 class="setting__title">Режим игры</h3>
+          <div class="segmented" id="modeGroup" role="radiogroup" aria-label="Режим игры">
+            <button class="segmented__option" type="button" role="radio" data-mode="memory" aria-checked="true">Запоминание</button>
+            <button class="segmented__option" type="button" role="radio" data-mode="free" aria-checked="false">Свободный</button>
+          </div>
+          <p class="setting__hint" id="modeHint">
+            Запоминание: классический Simon — последовательность растёт, ошибка завершает игру.
+          </p>
+        </section>
+
+        <section class="setting">
+          <h3 class="setting__title">Сложность</h3>
+          <div class="segmented segmented--wrap" id="sizeGroup" role="radiogroup" aria-label="Количество плиток">
+            <button class="segmented__option" type="button" role="radio" data-size="4" aria-checked="true">4</button>
+            <button class="segmented__option" type="button" role="radio" data-size="5" aria-checked="false">5</button>
+            <button class="segmented__option" type="button" role="radio" data-size="6" aria-checked="false">6</button>
+            <button class="segmented__option" type="button" role="radio" data-size="7" aria-checked="false">7</button>
+            <button class="segmented__option" type="button" role="radio" data-size="8" aria-checked="false">8</button>
+            <button class="segmented__option" type="button" role="radio" data-size="9" aria-checked="false">9</button>
+            <button class="segmented__option" type="button" role="radio" data-size="10" aria-checked="false">10</button>
+          </div>
+          <p class="setting__hint" id="sizeHint">Классический Simon: 4 сектора крестом.</p>
+        </section>
+
+        <section class="setting" id="layoutSection">
+          <h3 class="setting__title">Раскладка</h3>
+          <div class="segmented" id="layoutGroup" role="radiogroup" aria-label="Раскладка поля">
+            <button class="segmented__option" type="button" role="radio" data-layout="circle" aria-checked="true">Круг</button>
+            <button class="segmented__option" type="button" role="radio" data-layout="table" aria-checked="false">Таблица</button>
+          </div>
+          <p class="setting__hint" id="layoutHint">
+            Для 4 плиток доступны круг и таблица. Для 5–10 — только таблица.
+          </p>
+        </section>
+
+        <section class="setting">
+          <h3 class="setting__title">Звук</h3>
+          <div class="segmented segmented--three" id="soundGroup" role="radiogroup" aria-label="Звуковая схема">
+            <button class="segmented__option" type="button" role="radio" data-sound="sine" aria-checked="false">Синус</button>
+            <button class="segmented__option" type="button" role="radio" data-sound="timbre" aria-checked="true">Тембры</button>
+            <button class="segmented__option" type="button" role="radio" data-sound="melody" aria-checked="false">Мелодия</button>
+          </div>
+          <p class="setting__hint" id="soundHint">Разные тембры у каждой плитки — форма волны, гармоники, огибающая.</p>
+
+          <div class="slider-row">
+            <label class="slider-row__label" for="sustainRange">
+              Sustain
+              <span class="slider-row__value" id="sustainValue">1.0×</span>
+            </label>
+            <input
+              class="slider"
+              type="range"
+              id="sustainRange"
+              min="0.25"
+              max="3"
+              step="0.05"
+              value="1"
+              aria-label="Длительность затухания звука"
+            >
+          </div>
+          <p class="setting__hint" id="sustainHint">Короче — звук «щелчком», длиннее — плавное затухание.</p>
+        </section>
+
+        <section class="setting">
+          <h3 class="setting__title">Клавиши</h3>
+          <div class="keys" id="keysGroup"></div>
+          <p class="setting__hint">Нажмите на кнопку и введите новую клавишу. <kbd>Enter</kbd> — старт, изменить нельзя.</p>
+        </section>
+      </div>
+
+      <footer class="modal__footer">
+        <button class="btn btn--ghost" id="resetSettings" type="button">Сбросить настройки</button>
+        <button class="btn btn--start" id="closeSettings" type="button" data-close>Готово</button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
