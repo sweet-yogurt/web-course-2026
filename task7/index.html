@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Лента постов — бесконечный скролл</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <h1>&infin; Scroll</h1>
+    <input
+      type="text"
+      id="search"
+      class="search-input"
+      placeholder="Поиск по заголовку..."
+      autocomplete="off"
+    >
+  </header>
+
+  <main>
+    <div id="posts" class="posts"></div>
+
+    <div id="loader" class="loader hidden">
+      <div class="spinner"></div>
+      <span>Загрузка…</span>
+    </div>
+
+    <div id="error" class="error hidden"></div>
+
+    <div id="end" class="end hidden">Больше постов нет</div>
+  </main>
+
+  <button id="toTop" class="to-top hidden" title="Наверх" aria-label="Наверх">
+    ↑
+  </button>
+
+  <script src="script.js"></script>
+</body>
+</html>
