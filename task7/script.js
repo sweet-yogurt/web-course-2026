@@ -12,17 +12,12 @@ const state = {
   filter: '',
 };
 
-
-
-
 const postsContainer = document.getElementById('posts');
 const loaderEl = document.getElementById('loader');
 const errorEl = document.getElementById('error');
 const endEl = document.getElementById('end');
 const searchInput = document.getElementById('search');
 const toTopBtn = document.getElementById('toTop');
-
-
 
 function showLoader() { loaderEl.classList.remove('hidden'); }
 function hideLoader() { loaderEl.classList.add('hidden'); }
@@ -65,7 +60,6 @@ function createPostCard(post) {
   return card;
 }
 
-
 function renderPosts() {
   const filtered = getFilteredPosts();
   const fragment = document.createDocumentFragment();
@@ -83,7 +77,6 @@ function renderPosts() {
 
   postsContainer.replaceChildren(fragment);
 }
-
 
 async function fetchNextPortion() {
   if (!state.hasMore || state.isLoading) return false;
@@ -110,7 +103,6 @@ async function fetchNextPortion() {
     }
 
     if (posts.length === 0) {
-
       state.hasMore = false;
       showEnd();
       return false;
@@ -127,13 +119,11 @@ async function fetchNextPortion() {
     renderPosts();
     return true;
   } catch (err) {
-
     const message =
       err instanceof TypeError
         ? 'Не удалось подключиться к серверу. Проверьте интернет-соединение.'
         : `Ошибка загрузки: ${err.message}`;
     showError(message);
-
     return false;
   } finally {
     state.isLoading = false;
@@ -141,19 +131,11 @@ async function fetchNextPortion() {
   }
 }
 
-
 function isNearBottom() {
   const scrollTop = window.scrollY || document.documentElement.scrollTop;
   const viewportHeight = window.innerHeight;
   const fullHeight = document.documentElement.scrollHeight;
   return scrollTop + viewportHeight >= fullHeight - SCROLL_THRESHOLD;
-}
-
-async function handleScroll() {
-  if (state.isLoading || !state.hasMore) return;
-  if (isNearBottom()) {
-    await fetchNextPortion();
-  }
 }
 
 function updateToTopVisibility() {
@@ -169,6 +151,15 @@ function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+async function handleScroll() {
+  updateToTopVisibility();
+
+  if (state.isLoading || !state.hasMore) return;
+  if (isNearBottom()) {
+    await fetchNextPortion();
+  }
+}
+
 function debounce(fn, delay) {
   let timerId = null;
   return function (...args) {
@@ -182,11 +173,9 @@ const applyFilter = debounce((value) => {
   renderPosts();
 }, DEBOUNCE_DELAY);
 
-
 async function init() {
   renderPosts();
   await fetchNextPortion();
-
 
   window.addEventListener('scroll', handleScroll, { passive: true });
   searchInput.addEventListener('input', (e) => applyFilter(e.target.value));
@@ -195,5 +184,4 @@ async function init() {
   updateToTopVisibility();
 }
 
-renderPosts();
 document.addEventListener('DOMContentLoaded', init);
