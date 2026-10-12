@@ -1,35 +1,40 @@
-const API_URL = 'https://jsonplaceholder.typicode.com/posts';
-const PAGE_SIZE = 10;
-const TOTAL_POSTS = 100;
-const SCROLL_THRESHOLD = 200;
-const DEBOUNCE_DELAY = 300;
-
-const state = {
-  allPosts: [],
-  loadedCount: 0,
-  isLoading: false,
-  hasMore: true,
-  filter: '',
-};
-
-const postsContainer = document.getElementById('posts');
-const loaderEl = document.getElementById('loader');
-const errorEl = document.getElementById('error');
-const endEl = document.getElementById('end');
-const searchInput = document.getElementById('search');
-const toTopBtn = document.getElementById('toTop');
-
-function showLoader() { loaderEl.classList.remove('hidden'); }
-function hideLoader() { loaderEl.classList.add('hidden'); }
-
-function showError(message) {
-  errorEl.textContent = message;
-  errorEl.classList.remove('hidden');
+function createConfig() {
+  return {
+    API_URL: 'https://jsonplaceholder.typicode.com/posts',
+    PAGE_SIZE: 10,
+    TOTAL_POSTS: 100,
+    SCROLL_THRESHOLD: 200,
+    DEBOUNCE_DELAY: 300,
+  };
 }
-function hideError() { errorEl.classList.add('hidden'); }
 
-function showEnd() { endEl.classList.remove('hidden'); }
-function hideEnd() { endEl.classList.add('hidden'); }
+function createModel() {
+  return {
+    allPosts: [],
+    loadedCount: 0,
+    isLoading: false,
+    hasMore: true,
+    filter: '',
+  };
+}
+
+function createView() {
+  return {
+    postsContainer: document.getElementById('posts'),
+    loaderEl: document.getElementById('loader'),
+    errorEl: document.getElementById('error'),
+    endEl: document.getElementById('end'),
+    searchInput: document.getElementById('search'),
+    toTopBtn: document.getElementById('toTop'),
+  };
+}
+
+function getFilteredPosts(model) {
+  if (!model.filter) return model.allPosts;
+  return model.allPosts.filter(post =>
+    post.title.toLowerCase().includes(model.filter)
+  );
+}
 
 function escapeHtml(str) {
   return String(str)
@@ -38,13 +43,6 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-function getFilteredPosts() {
-  if (!state.filter) return state.allPosts;
-  return state.allPosts.filter(post =>
-    post.title.toLowerCase().includes(state.filter)
-  );
 }
 
 function createPostCard(post) {
@@ -60,14 +58,14 @@ function createPostCard(post) {
   return card;
 }
 
-function renderPosts() {
-  const filtered = getFilteredPosts();
+function renderPosts(model, view) {
+  const filtered = getFilteredPosts(model);
   const fragment = document.createDocumentFragment();
 
   if (filtered.length === 0) {
     const empty = document.createElement('div');
     empty.className = 'end';
-    empty.textContent = state.filter
+    empty.textContent = model.filter
       ? 'Ничего не найдено по вашему запросу.'
       : 'Постов пока нет.';
     fragment.appendChild(empty);
@@ -75,19 +73,31 @@ function renderPosts() {
     filtered.forEach(post => fragment.appendChild(createPostCard(post)));
   }
 
-  postsContainer.replaceChildren(fragment);
+  view.postsContainer.replaceChildren(fragment);
 }
 
-async function fetchNextPortion() {
-  if (!state.hasMore || state.isLoading) return false;
+function showLoader(view) { view.loaderEl.classList.remove('hidden'); }
+function hideLoader(view) { view.loaderEl.classList.add('hidden'); }
 
-  state.isLoading = true;
-  showLoader();
-  hideError();
+function showError(view, message) {
+  view.errorEl.textContent = message;
+  view.errorEl.classList.remove('hidden');
+}
+function hideError(view) { view.errorEl.classList.add('hidden'); }
 
-  const start = state.loadedCount;
-  const end = Math.min(start + PAGE_SIZE, TOTAL_POSTS);
-  const url = `${API_URL}?_start=${start}&_limit=${end - start}`;
+function showEnd(view) { view.endEl.classList.remove('hidden'); }
+function hideEnd(view) { view.endEl.classList.add('hidden'); }
+
+async function fetchNextPortion(model, view, config) {
+  if (!model.hasMore || model.isLoading) return false;
+
+  model.isLoading = true;
+  showLoader(view);
+  hideError(view);
+
+  const start = model.loadedCount;
+  const end = Math.min(start + config.PAGE_SIZE, config.TOTAL_POSTS);
+  const url = `${config.API_URL}?_start=${start}&_limit=${end - start}`;
 
   try {
     const response = await fetch(url);
@@ -103,47 +113,47 @@ async function fetchNextPortion() {
     }
 
     if (posts.length === 0) {
-      state.hasMore = false;
-      showEnd();
+      model.hasMore = false;
+      showEnd(view);
       return false;
     }
 
-    state.allPosts.push(...posts);
-    state.loadedCount += posts.length;
+    model.allPosts.push(...posts);
+    model.loadedCount += posts.length;
 
-    if (state.loadedCount >= TOTAL_POSTS || posts.length < PAGE_SIZE) {
-      state.hasMore = false;
-      showEnd();
+    if (model.loadedCount >= config.TOTAL_POSTS || posts.length < config.PAGE_SIZE) {
+      model.hasMore = false;
+      showEnd(view);
     }
 
-    renderPosts();
+    renderPosts(model, view);
     return true;
   } catch (err) {
     const message =
       err instanceof TypeError
         ? 'Не удалось подключиться к серверу. Проверьте интернет-соединение.'
         : `Ошибка загрузки: ${err.message}`;
-    showError(message);
+    showError(view, message);
     return false;
   } finally {
-    state.isLoading = false;
-    hideLoader();
+    model.isLoading = false;
+    hideLoader(view);
   }
 }
 
-function isNearBottom() {
+function isNearBottom(config) {
   const scrollTop = window.scrollY || document.documentElement.scrollTop;
   const viewportHeight = window.innerHeight;
   const fullHeight = document.documentElement.scrollHeight;
-  return scrollTop + viewportHeight >= fullHeight - SCROLL_THRESHOLD;
+  return scrollTop + viewportHeight >= fullHeight - config.SCROLL_THRESHOLD;
 }
 
-function updateToTopVisibility() {
+function updateToTopVisibility(view) {
   const scrollTop = window.scrollY || document.documentElement.scrollTop;
   if (scrollTop > 400) {
-    toTopBtn.classList.remove('hidden');
+    view.toTopBtn.classList.remove('hidden');
   } else {
-    toTopBtn.classList.add('hidden');
+    view.toTopBtn.classList.add('hidden');
   }
 }
 
@@ -151,12 +161,12 @@ function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-async function handleScroll() {
-  updateToTopVisibility();
+async function handleScroll(model, view, config) {
+  updateToTopVisibility(view);
 
-  if (state.isLoading || !state.hasMore) return;
-  if (isNearBottom()) {
-    await fetchNextPortion();
+  if (model.isLoading || !model.hasMore) return;
+  if (isNearBottom(config)) {
+    await fetchNextPortion(model, view, config);
   }
 }
 
@@ -168,20 +178,33 @@ function debounce(fn, delay) {
   };
 }
 
-const applyFilter = debounce((value) => {
-  state.filter = value.trim().toLowerCase();
-  renderPosts();
-}, DEBOUNCE_DELAY);
-
-async function init() {
-  renderPosts();
-  await fetchNextPortion();
-
-  window.addEventListener('scroll', handleScroll, { passive: true });
-  searchInput.addEventListener('input', (e) => applyFilter(e.target.value));
-  toTopBtn.addEventListener('click', scrollToTop);
-
-  updateToTopVisibility();
+function applyFilter(value, model, view) {
+  model.filter = value.trim().toLowerCase();
+  renderPosts(model, view);
 }
 
-document.addEventListener('DOMContentLoaded', init);
+async function init(model, view, config) {
+  renderPosts(model, view);
+  await fetchNextPortion(model, view, config);
+
+  const debouncedFilter = debounce(
+    (value) => applyFilter(value, model, view),
+    config.DEBOUNCE_DELAY
+  );
+
+  window.addEventListener('scroll', () => handleScroll(model, view, config), { passive: true });
+  view.searchInput.addEventListener('input', (e) => debouncedFilter(e.target.value));
+  view.toTopBtn.addEventListener('click', scrollToTop);
+
+  updateToTopVisibility(view);
+}
+
+function main() {
+  const config = createConfig();
+  const model = createModel();
+  const view = createView();
+
+  document.addEventListener('DOMContentLoaded', () => init(model, view, config));
+}
+
+main();
