@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zen-Money — учёт финансов</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>
+      <svg class="logo-icon" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+        <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          d="M3 7h15a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7z"/>
+        <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          d="M3 7V6a2 2 0 0 1 2-2h11"/>
+        <circle cx="16.5" cy="13.5" r="1.5" fill="currentColor"/>
+      </svg>
+      Zen-Money
+    </h1>
+  </header>
+
+  <main class="container">
+    <section class="summary">
+      <div class="summary-card income">
+        <span class="label">Доходы</span>
+        <span class="value" id="total-income">0 Br</span>
+      </div>
+      <div class="summary-card expense">
+        <span class="label">Расходы</span>
+        <span class="value" id="total-expense">0 Br</span>
+      </div>
+      <div class="summary-card balance">
+        <span class="label">Баланс</span>
+        <span class="value" id="total-balance">0 Br</span>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2 id="form-title">Добавить операцию</h2>
+      <form id="transaction-form" novalidate>
+        <input type="hidden" id="transaction-id" />
+
+        <div class="form-row">
+          <label>
+            Сумма *
+            <input type="number" id="amount" step="0.01" min="0.01" placeholder="0.00" />
+            <span class="error" id="error-amount"></span>
+          </label>
+          <label>
+            Тип
+            <div class="type-switch">
+              <button type="button" class="type-btn active" data-type="expense">Расход</button>
+              <button type="button" class="type-btn" data-type="income">Доход</button>
+            </div>
+            <input type="hidden" id="type" value="expense" />
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>
+            Категория *
+            <select id="category">
+              <option value="">— выберите —</option>
+            </select>
+            <span class="error" id="error-category"></span>
+          </label>
+          <label>
+            Дата *
+            <input type="date" id="date" />
+            <span class="error" id="error-date"></span>
+          </label>
+        </div>
+
+        <label>
+          Комментарий
+          <input type="text" id="comment" placeholder="Необязательно" />
+        </label>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" id="submit-btn">Добавить</button>
+          <button type="button" class="btn-secondary" id="cancel-edit" hidden>Отмена</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="transactions">
+      <h2>Операции</h2>
+      <div id="transactions-list" class="transactions-list"></div>
+      <p id="empty-message" class="empty-message" hidden>Нет операций.</p>
+    </section>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
