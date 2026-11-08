@@ -6,20 +6,17 @@ import { memo } from "react";
  */
 function Stats({ total, remaining, completed }) {
   return (
-    <section className="stats" aria-label="Статистика задач">
-      <div className="stat">
-        <span className="stat__label">Всего</span>
-        <strong className="stat__value">{total}</strong>
-      </div>
-      <div className="stat stat--remaining">
-        <span className="stat__label">Осталось</span>
-        <strong className="stat__value">{remaining}</strong>
-      </div>
-      <div className="stat stat--completed">
-        <span className="stat__label">Выполнено</span>
-        <strong className="stat__value">{completed}</strong>
-      </div>
-    </section>
+    <div className="counter" aria-label="Статистика задач">
+      <span>
+        Всего: <strong>{total}</strong>
+      </span>
+      <span>
+        Осталось: <strong>{remaining}</strong>
+      </span>
+      <span>
+        Выполнено: <strong>{completed}</strong>
+      </span>
+    </div>
   );
 }
 

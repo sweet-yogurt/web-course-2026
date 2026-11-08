@@ -12,7 +12,7 @@ export default function Filters({ value, onChange }) {
           key={filter.id}
           type="button"
           className={
-            filter.id === value ? "filter-button is-active" : "filter-button"
+            filter.id === value ? "filter-btn active" : "filter-btn"
           }
           aria-pressed={filter.id === value}
           onClick={() => onChange(filter.id)}

@@ -30,20 +30,20 @@ export default function TodoForm({ onAdd }) {
   }
 
   return (
-    <form className="todo-form" onSubmit={handleSubmit} noValidate>
-      <div className="todo-form__row">
+    <form className="input-section" onSubmit={handleSubmit} noValidate>
+      <div className="input-row">
         <input
-          className="todo-form__input"
           type="text"
           value={text}
           onChange={handleTextChange}
-          placeholder="Что нужно сделать?"
+          placeholder="Буханка молока, литр хлеба..."
           aria-label="Текст новой задачи"
           maxLength={120}
+          autoComplete="off"
         />
 
         <select
-          className="todo-form__status"
+          className="status-select"
           value={completed ? "done" : "active"}
           onChange={(event) => setCompleted(event.target.value === "done")}
           aria-label="Статус новой задачи"
@@ -52,16 +52,12 @@ export default function TodoForm({ onAdd }) {
           <option value="done">Выполненная</option>
         </select>
 
-        <button className="button button--primary" type="submit">
-          Добавить
-        </button>
+        <button type="submit">Добавить</button>
       </div>
 
-      {error && (
-        <p className="form-error" role="alert">
-          {error}
-        </p>
-      )}
+      <p className="warning-message" role="alert">
+        {error}
+      </p>
     </form>
   );
 }

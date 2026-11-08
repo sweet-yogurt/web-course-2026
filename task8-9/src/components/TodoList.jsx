@@ -12,11 +12,7 @@ import TodoItem from "./TodoItem.jsx";
  */
 function TodoList({ todos, onToggle, onDelete, onEdit }) {
   if (todos.length === 0) {
-    return (
-      <p className="empty-state">
-        По выбранному фильтру задач нет. Добавьте новую задачу.
-      </p>
-    );
+    return <p className="empty-state">По выбранному фильтру задач нет.</p>;
   }
 
   return (

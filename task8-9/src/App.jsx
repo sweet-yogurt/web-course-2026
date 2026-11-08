@@ -51,38 +51,38 @@ export default function App() {
   const stats = useMemo(() => getStats(todos), [todos]);
 
   return (
-    <div className="page">
-      <main className="app-shell">
-        <header className="app-header">
-          <p className="eyebrow">Лабораторная №8–9</p>
-          <h1>Todo-list</h1>
-          <p className="subtitle">
-            React · фильтры · сортировка · сохранение в localStorage
-          </p>
-        </header>
+    <main className="app">
+      <header className="app-header">
+        <h1 className="app-title">
+          <span className="title-bracket">[</span>
+          Todo-лист
+          <span className="title-bracket">]</span>
+        </h1>
+        <p className="app-subtitle">Лабораторная №8–9 · react</p>
+      </header>
 
-        <section className="panel">
-          <TodoForm onAdd={handleAdd} />
+      <TodoForm onAdd={handleAdd} />
 
-          <Stats
-            total={stats.total}
-            remaining={stats.remaining}
-            completed={stats.completed}
-          />
+      <section className="controls-section">
+        <Stats
+          total={stats.total}
+          remaining={stats.remaining}
+          completed={stats.completed}
+        />
+        <div className="toolbar">
+          <Filters value={filter} onChange={setFilter} />
+          <SortControls value={sort} onChange={setSort} />
+        </div>
+      </section>
 
-          <div className="toolbar">
-            <Filters value={filter} onChange={setFilter} />
-            <SortControls value={sort} onChange={setSort} />
-          </div>
-
-          <TodoList
-            todos={visibleTodos}
-            onToggle={handleToggle}
-            onDelete={handleDelete}
-            onEdit={handleEdit}
-          />
-        </section>
-      </main>
-    </div>
+      <section className="list-section">
+        <TodoList
+          todos={visibleTodos}
+          onToggle={handleToggle}
+          onDelete={handleDelete}
+          onEdit={handleEdit}
+        />
+      </section>
+    </main>
   );
 }

@@ -50,7 +50,7 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
   if (isEditing) {
     return (
       <li className="todo-item">
-        <form className="todo-item__edit" onSubmit={handleSave}>
+        <form className="todo-edit" onSubmit={handleSave}>
           <input
             type="text"
             value={draft}
@@ -59,29 +59,23 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
             maxLength={120}
             autoFocus
           />
-          <button className="button button--small button--primary" type="submit">
+          <button className="edit-btn" type="submit">
             Сохранить
           </button>
-          <button
-            className="button button--small"
-            type="button"
-            onClick={cancelEditing}
-          >
+          <button className="edit-btn" type="button" onClick={cancelEditing}>
             Отмена
           </button>
-          {error && (
-            <span className="form-error" role="alert">
-              {error}
-            </span>
-          )}
+          <span className="warning-message" role="alert">
+            {error}
+          </span>
         </form>
       </li>
     );
   }
 
   return (
-    <li className={todo.completed ? "todo-item is-done" : "todo-item"}>
-      <label className="todo-item__check">
+    <li className={todo.completed ? "todo-item completed" : "todo-item"}>
+      <label className="todo-check">
         <input
           type="checkbox"
           checked={todo.completed}
@@ -92,23 +86,22 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
               : `Отметить задачу «${todo.text}» выполненной`
           }
         />
-        <span className="todo-item__text">{todo.text}</span>
+        <span className="todo-text">{todo.text}</span>
       </label>
 
-      <time className="todo-item__date" dateTime={new Date(todo.createdAt).toISOString()}>
+      <time
+        className="todo-date"
+        dateTime={new Date(todo.createdAt).toISOString()}
+      >
         {dateFormatter.format(todo.createdAt)}
       </time>
 
-      <div className="todo-item__actions">
-        <button
-          className="button button--small"
-          type="button"
-          onClick={startEditing}
-        >
+      <div className="todo-actions">
+        <button className="edit-btn" type="button" onClick={startEditing}>
           Изменить
         </button>
         <button
-          className="button button--small button--danger"
+          className="delete-btn"
           type="button"
           onClick={() => onDelete(todo.id)}
         >
