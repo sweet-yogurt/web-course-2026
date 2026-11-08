@@ -51,7 +51,6 @@ python3 -m http.server 8080
 | GET | `/categories` | все категории |
 | POST | `/categories` | создать категорию |
 | GET | `/transactions` | операции с фильтрами `?category_id=&type=&from=&to=` |
-| GET | `/transactions/:id` | одна операция |
 | POST | `/transactions` | создать операцию |
 | PUT | `/transactions/:id` | обновить операцию |
 | DELETE | `/transactions/:id` | удалить операцию |

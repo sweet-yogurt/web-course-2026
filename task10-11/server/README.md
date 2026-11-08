@@ -18,7 +18,6 @@ npm start
 | GET | `/categories` | — |
 | POST | `/categories` | `{ "name": "Книги", "type": "expense" }` |
 | GET | `/transactions` | `?category_id=1&type=expense&from=2026-01-01&to=2026-12-31` |
-| GET | `/transactions/:id` | — |
 | POST | `/transactions` | `{ "amount": 42.5, "category_id": 1, "date": "2026-11-08", "comment": "Продукты" }` |
 | PUT | `/transactions/:id` | те же поля, что и у POST |
 | DELETE | `/transactions/:id` | — |

@@ -1,14 +1,16 @@
 import { store } from "../model/store.js";
 import { settings } from "../model/settings.js";
 
-import { summaryView } from "../view/summaryView.js";
-import { transactionListView } from "../view/transactionListView.js";
-import { transactionFormView } from "../view/transactionFormView.js";
-import { categorySelectView } from "../view/categorySelectView.js";
-import { filterView } from "../view/filterView.js";
-import { categoryFormView } from "../view/categoryFormView.js";
-import { themeView } from "../view/themeView.js";
-import { el } from "../view/dom.js";
+import {
+  el,
+  summaryView,
+  transactionListView,
+  transactionFormView,
+  categorySelectView,
+  filterView,
+  categoryFormView,
+  themeView,
+} from "../ui.js";
 
 export const appController = {
   init() {

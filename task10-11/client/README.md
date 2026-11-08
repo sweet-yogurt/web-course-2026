@@ -22,7 +22,8 @@ python3 -m http.server 8080
 ## Структура
 
 - `js/main.js` — точка входа;
-- `js/model/api.js` — все запросы к серверу;
+- `js/api.js` — все запросы к серверу;
+- `js/ui.js` — единая точка доступа к функциям отрисовки;
 - `js/model/store.js` — состояние, загрузка операций, сводка;
 - `js/model/settings.js` — тема и последние фильтры в `localStorage`;
 - `js/controller/appController.js` — обработчики и связывание модели с представлением;

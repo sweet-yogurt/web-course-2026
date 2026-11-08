@@ -68,24 +68,6 @@ router.get("/", (req, res) => {
   }
 });
 
-router.get("/:id", (req, res) => {
-  try {
-    const id = parsePositiveId(req.params.id);
-    if (!id) {
-      throw new NotFoundError("Операция не найдена");
-    }
-
-    const transaction = getTransactionById(id);
-    if (!transaction) {
-      throw new NotFoundError("Операция не найдена");
-    }
-
-    res.json(transaction);
-  } catch (error) {
-    sendError(res, error);
-  }
-});
-
 router.post("/", (req, res) => {
   try {
     const { amount, categoryId, date, comment } = validateTransactionPayload(
