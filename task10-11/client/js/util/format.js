@@ -1,4 +1,4 @@
-/* ---------- Форматирование денег ---------- */
+
 
 const fmtFull = new Intl.NumberFormat("ru-RU", {
   style: "currency",

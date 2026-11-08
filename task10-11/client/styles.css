@@ -16,13 +16,25 @@
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
+body.dark {
+  --bg: #1e272e;
+  --card-bg: #2d3436;
+  --text: #f5f6fa;
+  --text-muted: #b2bec3;
+  --border: #485460;
+  --primary: #74b9ff;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
 }
 
+/* ---------- Шапка ---------- */
 .app-header {
   display: flex;
   justify-content: space-between;
@@ -44,6 +56,23 @@ body {
   flex-shrink: 0;
 }
 
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.theme-toggle:hover {
+  background: var(--border);
+}
+
+/* ---------- Контейнер ---------- */
 .container {
   max-width: 960px;
   margin: 2rem auto;
@@ -53,6 +82,7 @@ body {
   gap: 1.5rem;
 }
 
+/* ---------- Сводка ---------- */
 .summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -64,6 +94,7 @@ body {
   padding: 1.2rem;
   border-radius: 12px;
   box-shadow: var(--shadow);
+  border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -86,24 +117,19 @@ body {
   max-width: 100%;
 }
 
-.summary-card.income .value {
-  color: var(--income);
-}
+.summary-card.income .value { color: var(--income); }
+.summary-card.expense .value { color: var(--expense); }
+.summary-card.balance .value { color: var(--primary); }
 
-.summary-card.expense .value {
-  color: var(--expense);
-}
-
-.summary-card.balance .value {
-  color: var(--primary);
-}
-
+/* ---------- Секции (единый вид карточек) ---------- */
 .form-section,
+.filters,
 .transactions {
   background: var(--card-bg);
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: var(--shadow);
+  border: 1px solid var(--border);
 }
 
 h2 {
@@ -111,6 +137,24 @@ h2 {
   margin-bottom: 1rem;
 }
 
+/* ---------- Фильтры ---------- */
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.filters-grid label {
+  margin-bottom: 0;
+}
+
+.filters-grid .btn-secondary {
+  align-self: end;
+  height: fit-content;
+}
+
+/* ---------- Формы ---------- */
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -157,6 +201,7 @@ select.invalid {
   display: block;
 }
 
+/* ---------- Переключатель типа ---------- */
 .type-switch {
   display: flex;
   gap: 0.5rem;
@@ -181,6 +226,7 @@ select.invalid {
   border-color: var(--primary);
 }
 
+/* ---------- Кнопки ---------- */
 .btn-primary,
 .btn-secondary {
   padding: 0.6rem 1.2rem;
@@ -212,6 +258,7 @@ select.invalid {
   gap: 0.5rem;
 }
 
+/* ---------- Список операций ---------- */
 .transactions-list {
   display: flex;
   flex-direction: column;
@@ -229,13 +276,8 @@ select.invalid {
   border-left: 4px solid var(--border);
 }
 
-.transaction-item.income {
-  border-left-color: var(--income);
-}
-
-.transaction-item.expense {
-  border-left-color: var(--expense);
-}
+.transaction-item.income { border-left-color: var(--income); }
+.transaction-item.expense { border-left-color: var(--expense); }
 
 .transaction-date {
   font-size: 0.85rem;
@@ -250,9 +292,7 @@ select.invalid {
   min-width: 0;
 }
 
-.transaction-category {
-  font-weight: 600;
-}
+.transaction-category { font-weight: 600; }
 
 .transaction-comment {
   font-size: 0.85rem;
@@ -274,18 +314,10 @@ select.invalid {
   text-overflow: ellipsis;
 }
 
-.transaction-amount.income {
-  color: var(--income);
-}
+.transaction-amount.income { color: var(--income); }
+.transaction-amount.expense { color: var(--expense); }
 
-.transaction-amount.expense {
-  color: var(--expense);
-}
-
-.transaction-actions {
-  display: flex;
-  gap: 0.4rem;
-}
+.transaction-actions { display: flex; gap: 0.4rem; }
 
 .icon-btn {
   background: none;
@@ -300,21 +332,10 @@ select.invalid {
   transition: background 0.2s, color 0.2s;
 }
 
-.icon-btn svg {
-  display: block;
-}
-
-.icon-btn:hover {
-  background: var(--border);
-}
-
-.icon-btn.edit-btn:hover {
-  color: var(--primary);
-}
-
-.icon-btn.delete-btn:hover {
-  color: var(--expense);
-}
+.icon-btn svg { display: block; }
+.icon-btn:hover { background: var(--border); }
+.icon-btn.edit-btn:hover { color: var(--primary); }
+.icon-btn.delete-btn:hover { color: var(--expense); }
 
 .empty-message {
   text-align: center;
@@ -322,22 +343,18 @@ select.invalid {
   padding: 1.5rem;
 }
 
+/* ---------- Адаптив ---------- */
 @media (max-width: 600px) {
-  .summary {
-    grid-template-columns: 1fr;
-  }
+  .summary { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .transaction-item { grid-template-columns: 1fr; gap: 0.4rem; }
+  .transaction-amount { text-align: left; max-width: none; }
+}
 
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .transaction-item {
-    grid-template-columns: 1fr;
-    gap: 0.4rem;
-  }
-
-  .transaction-amount {
-    text-align: left;
-    max-width: none;
-  }
+section.filters {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border, #dfe6e9);
+  border-radius: 12px;
+  box-shadow: var(--shadow, 0 2px 8px rgba(0, 0, 0, 0.06));
+  padding: 1.5rem;
 }

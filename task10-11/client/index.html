@@ -18,9 +18,21 @@
       </svg>
       Zen-Money
     </h1>
+    <button id="theme-toggle" class="theme-toggle" title="Переключить тему" aria-label="Переключить тему">
+      <svg id="theme-icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <svg id="theme-icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" hidden>
+        <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+        <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+    </button>
   </header>
 
   <main class="container">
+    <!-- Сводка -->
     <section class="summary">
       <div class="summary-card income">
         <span class="label">Доходы</span>
@@ -36,6 +48,37 @@
       </div>
     </section>
 
+    <!-- Фильтры -->
+    <section class="filters">
+      <h2>Фильтры</h2>
+      <div class="filters-grid">
+        <label>
+          Тип
+          <select id="filter-type">
+            <option value="all">Все</option>
+            <option value="income">Только доходы</option>
+            <option value="expense">Только расходы</option>
+          </select>
+        </label>
+        <label>
+          Категория
+          <select id="filter-category">
+            <option value="">Все категории</option>
+          </select>
+        </label>
+        <label>
+          С даты
+          <input type="date" id="filter-date-from" />
+        </label>
+        <label>
+          По дату
+          <input type="date" id="filter-date-to" />
+        </label>
+        <button id="filter-reset" class="btn-secondary" type="button">Сбросить</button>
+      </div>
+    </section>
+
+    <!-- Форма операции -->
     <section class="form-section">
       <h2 id="form-title">Добавить операцию</h2>
       <form id="transaction-form" novalidate>
@@ -84,10 +127,33 @@
       </form>
     </section>
 
+    <!-- Новая категория -->
+    <section class="form-section">
+      <h2>Новая категория</h2>
+      <form id="category-form" novalidate>
+        <div class="form-row">
+          <label>
+            Название *
+            <input type="text" id="category-name" placeholder="Например: Спорт" />
+            <span class="error" id="error-category-name"></span>
+          </label>
+          <label>
+            Тип *
+            <select id="category-type">
+              <option value="expense">Расход</option>
+              <option value="income">Доход</option>
+            </select>
+          </label>
+        </div>
+        <button type="submit" class="btn-primary">Создать категорию</button>
+      </form>
+    </section>
+
+    <!-- Список операций -->
     <section class="transactions">
       <h2>Операции</h2>
       <div id="transactions-list" class="transactions-list"></div>
-      <p id="empty-message" class="empty-message" hidden>Нет операций.</p>
+      <p id="empty-message" class="empty-message" hidden>Нет операций по выбранным фильтрам.</p>
     </section>
   </main>
 

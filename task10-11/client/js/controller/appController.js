@@ -1,16 +1,29 @@
 import { store } from "../model/store.js";
+import { settings } from "../model/settings.js";
+
 import { summaryView } from "../view/summaryView.js";
 import { transactionListView } from "../view/transactionListView.js";
 import { transactionFormView } from "../view/transactionFormView.js";
 import { categorySelectView } from "../view/categorySelectView.js";
+import { filterView } from "../view/filterView.js";
+import { categoryFormView } from "../view/categoryFormView.js";
+import { themeView } from "../view/themeView.js";
 import { el } from "../view/dom.js";
 
 export const appController = {
   init() {
-    // Model → View: при любом изменении перерисовываем
+
+    const saved = settings.load();
+    themeView.apply(saved.theme);
+    store.setFilters(saved.filters);
+
+
     store.subscribe((state) => this.render(state));
 
+
     this.bindEvents();
+
+
     this.loadData();
   },
 
@@ -25,24 +38,27 @@ export const appController = {
   render(state) {
     summaryView.render(store.getSummary());
     categorySelectView.render(state.categories);
-    transactionListView.render(state.transactions, state.categories);
+    filterView.render(state.filters);
+    transactionListView.render(
+      store.getFilteredTransactions(),
+      state.categories
+    );
   },
 
   bindEvents() {
-    // Переключатель типа
+
+
     el.typeButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
         transactionFormView.setActiveType(btn.dataset.type);
       });
     });
 
-    // Отправка формы
     el.form.addEventListener("submit", (e) => {
       e.preventDefault();
       this.handleSubmit();
     });
 
-    // Очистка ошибок при вводе
     ["amount", "category", "date"].forEach((fieldId) => {
       const field = document.getElementById(fieldId);
       const handler = () => transactionFormView.clearError(fieldId);
@@ -50,12 +66,12 @@ export const appController = {
       field.addEventListener("change", handler);
     });
 
-    // Отмена редактирования
     el.cancelEdit.addEventListener("click", () => {
       transactionFormView.resetForm();
     });
 
-    // Делегирование: edit / delete
+
+
     el.list.addEventListener("click", (e) => {
       const editBtn = e.target.closest(".edit-btn");
       const deleteBtn = e.target.closest(".delete-btn");
@@ -63,11 +79,49 @@ export const appController = {
       if (editBtn) this.handleEdit(editBtn.dataset.id);
       if (deleteBtn) this.handleDelete(deleteBtn.dataset.id);
     });
+
+
+
+    const onFilterChange = () => {
+      const values = filterView.getValues();
+      store.setFilters(values);
+      settings.saveFilters(values);
+    };
+
+    el.filterType.addEventListener("change", onFilterChange);
+    el.filterCategory.addEventListener("change", onFilterChange);
+    el.filterDateFrom.addEventListener("change", onFilterChange);
+    el.filterDateTo.addEventListener("change", onFilterChange);
+
+    el.filterReset.addEventListener("click", () => {
+      store.resetFilters();
+      settings.clearFilters();
+    });
+
+
+
+    el.categoryForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      this.handleCategorySubmit();
+    });
+
+    el.categoryName.addEventListener("input", () => {
+      categoryFormView.clearError();
+    });
+
+
+
+    el.themeToggle.addEventListener("click", () => {
+      const isDark = document.body.classList.contains("dark");
+      const next = isDark ? "light" : "dark";
+      themeView.apply(next);
+      settings.saveTheme(next);
+    });
   },
 
-  /* ---------- Валидация ---------- */
 
-  validate(data) {
+
+  validateTransaction(data) {
     transactionFormView.clearAllErrors();
     let valid = true;
 
@@ -95,11 +149,11 @@ export const appController = {
     return valid;
   },
 
-  /* ---------- Действия ---------- */
+
 
   async handleSubmit() {
     const raw = transactionFormView.getFormData();
-    if (!this.validate(raw)) return;
+    if (!this.validateTransaction(raw)) return;
 
     const payload = {
       amount: Number(raw.amount),
@@ -141,6 +195,28 @@ export const appController = {
     } catch (err) {
       console.error("Ошибка при удалении:", err);
       alert(`Не удалось удалить операцию (id=${id}). Проверьте, что json-server запущен.`);
+    }
+  },
+
+
+
+  async handleCategorySubmit() {
+    const values = categoryFormView.getValues();
+
+    if (!values.name) {
+      categoryFormView.showError("Введите название категории");
+      return;
+    }
+
+    try {
+      await store.createCategory({
+        name: values.name,
+        type: values.type,
+      });
+      categoryFormView.reset();
+    } catch (err) {
+      console.error("Ошибка при создании категории:", err);
+      alert("Не удалось создать категорию");
     }
   },
 };

@@ -49,7 +49,7 @@ export const transactionFormView = {
     el.type.value = type;
   },
 
-  /* ---------- Ошибки ---------- */
+
 
   showError(fieldId, message) {
     const field = document.getElementById(fieldId);

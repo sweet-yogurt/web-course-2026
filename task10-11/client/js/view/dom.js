@@ -1,12 +1,24 @@
 export const $ = (id) => document.getElementById(id);
 
 export const el = {
-  // summary
+
   totalIncome: $("total-income"),
   totalExpense: $("total-expense"),
   totalBalance: $("total-balance"),
 
-  // form
+
+  themeToggle: $("theme-toggle"),
+  themeIconMoon: $("theme-icon-moon"),
+  themeIconSun: $("theme-icon-sun"),
+
+
+  filterType: $("filter-type"),
+  filterCategory: $("filter-category"),
+  filterDateFrom: $("filter-date-from"),
+  filterDateTo: $("filter-date-to"),
+  filterReset: $("filter-reset"),
+
+
   form: $("transaction-form"),
   formTitle: $("form-title"),
   transactionId: $("transaction-id"),
@@ -19,12 +31,18 @@ export const el = {
   submitBtn: $("submit-btn"),
   cancelEdit: $("cancel-edit"),
 
-  // errors
+
   errorAmount: $("error-amount"),
   errorCategory: $("error-category"),
   errorDate: $("error-date"),
 
-  // list
+
+  categoryForm: $("category-form"),
+  categoryName: $("category-name"),
+  categoryType: $("category-type"),
+  errorCategoryName: $("error-category-name"),
+
+
   list: $("transactions-list"),
   empty: $("empty-message"),
 };

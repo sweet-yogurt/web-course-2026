@@ -45,4 +45,10 @@ export const api = {
 
   deleteTransaction: (id) =>
     request(`${BASE_URL}/transactions/${id}`, { method: "DELETE" }),
+
+  addCategory: (category) =>
+    request(`${BASE_URL}/categories`, {
+      method: "POST",
+      body: JSON.stringify(category),
+    }),
 };

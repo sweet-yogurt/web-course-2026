@@ -1,15 +1,16 @@
 import { api } from "./api.js";
 
-/**
- * Простая реализация Observer-паттерна:
- *   store.subscribe(fn)  → fn(state) при каждом изменении
- *   store.getState()     → { transactions, categories }
- */
 class Store {
   constructor() {
     this.state = {
       transactions: [],
       categories: [],
+      filters: {
+        type: "all",
+        categoryId: "",
+        dateFrom: "",
+        dateTo: "",
+      },
     };
     this.listeners = new Set();
   }
@@ -34,7 +35,7 @@ class Store {
     this.notify();
   }
 
-  /* ---------- Загрузка ---------- */
+
 
   async loadAll() {
     const [transactions, categories] = await Promise.all([
@@ -44,13 +45,11 @@ class Store {
     this.setState({ transactions, categories });
   }
 
-  /* ---------- CRUD ---------- */
+
 
   async createTransaction(payload) {
     const created = await api.addTransaction(payload);
-    this.setState({
-      transactions: [...this.state.transactions, created],
-    });
+    this.setState({ transactions: [...this.state.transactions, created] });
     return created;
   }
 
@@ -71,14 +70,48 @@ class Store {
     this.setState({ transactions });
   }
 
-  /* ---------- Производные данные ---------- */
+
+
+  async createCategory(payload) {
+    const created = await api.addCategory(payload);
+    this.setState({ categories: [...this.state.categories, created] });
+    return created;
+  }
+
+
+
+  setFilters(patch) {
+    this.setState({ filters: { ...this.state.filters, ...patch } });
+  }
+
+  resetFilters() {
+    this.setState({
+      filters: {
+        type: "all",
+        categoryId: "",
+        dateFrom: "",
+        dateTo: "",
+      },
+    });
+  }
+
+  getFilteredTransactions() {
+    const { transactions, filters } = this.state;
+    const { type, categoryId, dateFrom, dateTo } = filters;
+
+    return transactions.filter((t) => {
+      if (type !== "all" && t.type !== type) return false;
+      if (categoryId && String(t.categoryId) !== String(categoryId)) return false;
+      if (dateFrom && t.date < dateFrom) return false;
+      if (dateTo && t.date > dateTo) return false;
+      return true;
+    });
+  }
+
+
 
   getTransactionById(id) {
     return this.state.transactions.find((t) => String(t.id) === String(id));
-  }
-
-  getCategoryById(id) {
-    return this.state.categories.find((c) => String(c.id) === String(id));
   }
 
   getSummary() {
