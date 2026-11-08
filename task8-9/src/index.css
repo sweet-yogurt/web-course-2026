@@ -294,6 +294,15 @@ select {
   min-height: 3rem;
 }
 
+.list-viewport {
+  overflow: hidden;
+  transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.list-inner {
+  min-height: 0;
+}
+
 .todo-list {
   display: flex;
   flex-direction: column;
@@ -320,6 +329,22 @@ select {
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+.todo-item.is-removing {
+  pointer-events: none;
+  animation: item-remove 0.28s ease forwards;
+}
+
+@keyframes item-remove {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(28px);
   }
 }
 
@@ -508,5 +533,16 @@ select {
   .edit-btn,
   .delete-btn {
     font-size: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list-viewport {
+    transition: none;
+  }
+
+  .todo-item,
+  .todo-item.is-removing {
+    animation: none;
   }
 }

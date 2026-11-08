@@ -1,4 +1,6 @@
-import { memo, useState } from "react";
+import { memo, useRef, useState } from "react";
+
+const REMOVE_ANIMATION_MS = 280;
 
 const dateFormatter = new Intl.DateTimeFormat("ru-RU", {
   day: "2-digit",
@@ -19,8 +21,10 @@ const dateFormatter = new Intl.DateTimeFormat("ru-RU", {
  */
 function TodoItem({ todo, onToggle, onDelete, onEdit }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
   const [draft, setDraft] = useState(todo.text);
   const [error, setError] = useState("");
+  const removeTimerRef = useRef(null);
 
   function startEditing() {
     setDraft(todo.text);
@@ -45,6 +49,20 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
     onEdit(todo.id, value);
     setIsEditing(false);
     setError("");
+  }
+
+  function handleDelete() {
+    if (isRemoving) return;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    setIsRemoving(true);
+    removeTimerRef.current = setTimeout(
+      () => onDelete(todo.id),
+      prefersReducedMotion ? 0 : REMOVE_ANIMATION_MS
+    );
   }
 
   if (isEditing) {
@@ -74,7 +92,11 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
   }
 
   return (
-    <li className={todo.completed ? "todo-item completed" : "todo-item"}>
+    <li
+      className={`todo-item${todo.completed ? " completed" : ""}${
+        isRemoving ? " is-removing" : ""
+      }`}
+    >
       <label className="todo-check">
         <input
           type="checkbox"
@@ -100,11 +122,7 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
         <button className="edit-btn" type="button" onClick={startEditing}>
           Изменить
         </button>
-        <button
-          className="delete-btn"
-          type="button"
-          onClick={() => onDelete(todo.id)}
-        >
+        <button className="delete-btn" type="button" onClick={handleDelete}>
           Удалить
         </button>
       </div>

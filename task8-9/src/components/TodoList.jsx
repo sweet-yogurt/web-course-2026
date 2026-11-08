@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useLayoutEffect, useRef, useState } from "react";
 import TodoItem from "./TodoItem.jsx";
 
 /**
@@ -11,22 +11,43 @@ import TodoItem from "./TodoItem.jsx";
  * }} props
  */
 function TodoList({ todos, onToggle, onDelete, onEdit }) {
-  if (todos.length === 0) {
-    return <p className="empty-state">По выбранному фильтру задач нет.</p>;
-  }
+  const contentRef = useRef(null);
+  const [listHeight, setListHeight] = useState(null);
+
+  useLayoutEffect(() => {
+    const node = contentRef.current;
+    if (!node) return undefined;
+
+    const updateHeight = () => setListHeight(node.scrollHeight);
+    updateHeight();
+
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, [todos]);
 
   return (
-    <ul className="todo-list">
-      {todos.map((todo) => (
-        <TodoItem
-          key={todo.id}
-          todo={todo}
-          onToggle={onToggle}
-          onDelete={onDelete}
-          onEdit={onEdit}
-        />
-      ))}
-    </ul>
+    <div
+      className="list-viewport"
+      style={{ height: listHeight === null ? "auto" : `${listHeight}px` }}
+    >
+      <div className="list-inner" ref={contentRef}>
+        {todos.length === 0 ? (
+          <p className="empty-state">По выбранному фильтру задач нет.</p>
+        ) : (
+          <ul className="todo-list">
+            {todos.map((todo) => (
+              <TodoItem
+                key={todo.id}
+                todo={todo}
+                onToggle={onToggle}
+                onDelete={onDelete}
+                onEdit={onEdit}
+              />
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
   );
 }
 
