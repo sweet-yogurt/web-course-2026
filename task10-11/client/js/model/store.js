@@ -13,6 +13,7 @@ class Store {
       },
     };
     this.listeners = new Set();
+    this.transactionsRequestId = 0;
   }
 
   getState() {
@@ -35,50 +36,46 @@ class Store {
     this.notify();
   }
 
-
-
   async loadAll() {
-    const [transactions, categories] = await Promise.all([
-      api.getTransactions(),
+    const [categories, transactions] = await Promise.all([
       api.getCategories(),
+      api.getTransactions(this.state.filters),
     ]);
-    this.setState({ transactions, categories });
+
+    this.setState({ categories, transactions });
   }
 
+  async loadTransactions() {
+    const requestId = ++this.transactionsRequestId;
+    const transactions = await api.getTransactions(this.state.filters);
 
+    if (requestId !== this.transactionsRequestId) return;
+
+    this.setState({ transactions });
+  }
 
   async createTransaction(payload) {
     const created = await api.addTransaction(payload);
-    this.setState({ transactions: [...this.state.transactions, created] });
+    await this.loadTransactions();
     return created;
   }
 
   async updateTransaction(id, payload) {
-    const updated = await api.updateTransaction(id, { ...payload, id });
-    const transactions = this.state.transactions.map((t) =>
-      String(t.id) === String(id) ? updated : t
-    );
-    this.setState({ transactions });
+    const updated = await api.updateTransaction(id, payload);
+    await this.loadTransactions();
     return updated;
   }
 
   async deleteTransaction(id) {
     await api.deleteTransaction(id);
-    const transactions = this.state.transactions.filter(
-      (t) => String(t.id) !== String(id)
-    );
-    this.setState({ transactions });
+    await this.loadTransactions();
   }
-
-
 
   async createCategory(payload) {
     const created = await api.addCategory(payload);
     this.setState({ categories: [...this.state.categories, created] });
     return created;
   }
-
-
 
   setFilters(patch) {
     this.setState({ filters: { ...this.state.filters, ...patch } });
@@ -95,21 +92,6 @@ class Store {
     });
   }
 
-  getFilteredTransactions() {
-    const { transactions, filters } = this.state;
-    const { type, categoryId, dateFrom, dateTo } = filters;
-
-    return transactions.filter((t) => {
-      if (type !== "all" && t.type !== type) return false;
-      if (categoryId && String(t.categoryId) !== String(categoryId)) return false;
-      if (dateFrom && t.date < dateFrom) return false;
-      if (dateTo && t.date > dateTo) return false;
-      return true;
-    });
-  }
-
-
-
   getTransactionById(id) {
     return this.state.transactions.find((t) => String(t.id) === String(id));
   }
@@ -117,10 +99,12 @@ class Store {
   getSummary() {
     const income = this.state.transactions
       .filter((t) => t.type === "income")
-      .reduce((s, t) => s + Number(t.amount), 0);
+      .reduce((sum, t) => sum + Number(t.amount), 0);
+
     const expense = this.state.transactions
       .filter((t) => t.type === "expense")
-      .reduce((s, t) => s + Number(t.amount), 0);
+      .reduce((sum, t) => sum + Number(t.amount), 0);
+
     return { income, expense, balance: income - expense };
   }
 }
