@@ -61,7 +61,7 @@ PUT /transactions/1
 DELETE /transactions/1
 [204]
 
-GET /transactions/999
+DELETE /transactions/999
 {"error":"Операция не найдена"}
 [404]
 
