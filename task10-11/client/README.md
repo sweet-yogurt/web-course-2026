@@ -1,21 +1,32 @@
-# Лабораторная работа №8. Базовый CRUD на чистом JS (ES-модули) с json-server.
+# Zen-Money — клиент
 
-## Требования
-
-- Node.js 18+
-- npm / npx
+Фронтенд лабораторной №10–11: работает с сервером `http://localhost:3001`, фильтры отправляются в `GET /transactions` как query-параметры.
 
 ## Запуск
 
-1. json-server (глобально или локально):
+Сначала запустить сервер из `../server`:
 
 ```bash
-    npm install -g json-server
-    json-server --watch db.json --port 3001
+npm install
+npm start
 ```
 
-2. Приложение 
+Затем в этой папке запустить статический сервер:
 
 ```bash
-    python -m http.server 8080
+python3 -m http.server 8080
 ```
+
+Открыть `http://localhost:8080`.
+
+## Структура
+
+- `js/main.js` — точка входа;
+- `js/model/api.js` — все запросы к серверу;
+- `js/model/store.js` — состояние, загрузка операций, сводка;
+- `js/model/settings.js` — тема и последние фильтры в `localStorage`;
+- `js/controller/appController.js` — обработчики и связывание модели с представлением;
+- `js/view/` — отрисовка формы, списка, фильтров, сводки и категорий;
+- `js/util/format.js` — форматирование денег и дат.
+
+`db.json` остался от старой версии на json-server и больше не используется.
