@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { getRepository } from "@/lib/repository";
 import { sendError, readJson } from "@/lib/http";
 import { validateCategoryPayload } from "@/lib/validation";
 
@@ -7,12 +7,8 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const db = getDb();
-    const categories = db
-      .prepare("SELECT id, name, type FROM categories ORDER BY id")
-      .all();
-
-    return NextResponse.json(categories);
+    const repository = await getRepository();
+    return NextResponse.json(await repository.listCategories());
   } catch (error) {
     return sendError(error);
   }
@@ -20,16 +16,9 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    const { name, type } = validateCategoryPayload(await readJson(request));
-    const db = getDb();
-
-    const result = db
-      .prepare("INSERT INTO categories (name, type) VALUES (?, ?)")
-      .run(name, type);
-
-    const category = db
-      .prepare("SELECT id, name, type FROM categories WHERE id = ?")
-      .get(result.lastInsertRowid);
+    const payload = validateCategoryPayload(await readJson(request));
+    const repository = await getRepository();
+    const category = await repository.createCategory(payload);
 
     return NextResponse.json(category, { status: 201 });
   } catch (error) {
