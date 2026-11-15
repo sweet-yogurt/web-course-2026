@@ -15,7 +15,7 @@
 - [task7](./task7)
 - [task8-9](./task8-9)
 - [task10-11](./task10-11)
-- [task12-13](./task12-13)
+- [task12-13](./task12-13) — [демо на Vercel](https://web-course-2026-chi.vercel.app)
 - [task14](./task14)
 - [task15](./task15)
 - [task16](./task16)
