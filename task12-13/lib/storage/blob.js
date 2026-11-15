@@ -8,8 +8,47 @@ import {
 import { ValidationError, isValidDate, parsePositiveId } from "@/lib/validation";
 
 const PATHNAME = "zen-money/data.json";
-const ACCESS = process.env.BLOB_ACCESS === "private" ? "private" : "public";
 const MAX_WRITE_ATTEMPTS = 5;
+
+// BLOB_ACCESS можно задать явно. Если переменной нет, режим определяется
+// по URL существующего blob или по ошибке записи в private-store.
+const configuredAccess =
+  process.env.BLOB_ACCESS === "private"
+    ? "private"
+    : process.env.BLOB_ACCESS === "public"
+      ? "public"
+      : null;
+
+let accessMode = configuredAccess;
+
+function resolveAccess(meta) {
+  if (accessMode) return accessMode;
+
+  accessMode = meta.url.includes(".private.") ? "private" : "public";
+  return accessMode;
+}
+
+async function putBlob(pathname, body, options) {
+  const access = accessMode ?? "public";
+
+  try {
+    const result = await put(pathname, body, { ...options, access });
+    accessMode = access;
+    return result;
+  } catch (error) {
+    const canRetryAsPrivate =
+      !configuredAccess &&
+      access === "public" &&
+      /private store/i.test(error.message);
+
+    if (!canRetryAsPrivate) {
+      throw error;
+    }
+
+    accessMode = "private";
+    return put(pathname, body, { ...options, access: "private" });
+  }
+}
 
 const INITIAL_CATEGORIES = [
   { name: "Еда", type: "expense" },
@@ -112,11 +151,13 @@ async function readPublicContent(meta) {
 }
 
 async function readContent(meta) {
-  if (ACCESS === "public") {
+  const access = resolveAccess(meta);
+
+  if (access === "public") {
     return readPublicContent(meta);
   }
 
-  const result = await get(PATHNAME, { access: ACCESS, useCache: false });
+  const result = await get(PATHNAME, { access, useCache: false });
   if (!result || result.statusCode === 304 || !result.stream) {
     throw new Error("Не удалось прочитать данные из Blob");
   }
@@ -139,8 +180,7 @@ async function readData() {
     const data = createInitialData();
 
     try {
-      const saved = await put(PATHNAME, JSON.stringify(data), {
-        access: ACCESS,
+      const saved = await putBlob(PATHNAME, JSON.stringify(data), {
         addRandomSuffix: false,
         allowOverwrite: false,
         contentType: "application/json",
@@ -148,11 +188,19 @@ async function readData() {
       });
 
       return { data, etag: saved.etag };
-    } catch (error) {
+    } catch (createError) {
       // Параллельный запрос мог создать файл первым — перечитываем его.
-      const existingMeta = await head(PATHNAME);
-      const text = await readContent(existingMeta);
-      return { data: normalizeData(JSON.parse(text)), etag: existingMeta.etag };
+      // Если и это не удалось, показываем исходную ошибку записи.
+      try {
+        const existingMeta = await head(PATHNAME);
+        const text = await readContent(existingMeta);
+        return {
+          data: normalizeData(JSON.parse(text)),
+          etag: existingMeta.etag,
+        };
+      } catch {
+        throw createError;
+      }
     }
   }
 
@@ -161,8 +209,7 @@ async function readData() {
 }
 
 async function writeData(data, etag) {
-  return put(PATHNAME, JSON.stringify(data), {
-    access: ACCESS,
+  return putBlob(PATHNAME, JSON.stringify(data), {
     addRandomSuffix: false,
     allowOverwrite: true,
     contentType: "application/json",
