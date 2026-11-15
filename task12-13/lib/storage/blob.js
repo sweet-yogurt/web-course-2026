@@ -22,10 +22,28 @@ const configuredAccess =
 let accessMode = configuredAccess;
 
 function resolveAccess(meta) {
+  // URL blob'а — самый надёжный источник: public- и private-store
+  // отдают разные домены.
+  if (meta.url.includes(".private.")) {
+    accessMode = "private";
+    return accessMode;
+  }
+
+  if (meta.url.includes(".public.")) {
+    accessMode = "public";
+    return accessMode;
+  }
+
   if (accessMode) return accessMode;
 
-  accessMode = meta.url.includes(".private.") ? "private" : "public";
+  accessMode = "public";
   return accessMode;
+}
+
+function accessFromStoreError(message) {
+  if (/access on a private store/i.test(message)) return "private";
+  if (/access on a public store/i.test(message)) return "public";
+  return null;
 }
 
 async function putBlob(pathname, body, options) {
@@ -36,17 +54,15 @@ async function putBlob(pathname, body, options) {
     accessMode = access;
     return result;
   } catch (error) {
-    const canRetryAsPrivate =
-      !configuredAccess &&
-      access === "public" &&
-      /private store/i.test(error.message);
+    // Если BLOB_ACCESS задан неверно, store сам подскажет правильный режим.
+    const fallback = accessFromStoreError(error.message);
 
-    if (!canRetryAsPrivate) {
+    if (!fallback || fallback === access) {
       throw error;
     }
 
-    accessMode = "private";
-    return put(pathname, body, { ...options, access: "private" });
+    accessMode = fallback;
+    return put(pathname, body, { ...options, access: fallback });
   }
 }
 
