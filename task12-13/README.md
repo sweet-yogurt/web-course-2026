@@ -1,5 +1,7 @@
 # Лабораторная работа №12–13. Zen-Money на Next.js
 
+## [Хостинг](https://web-course-2026-chi.vercel.app/)
+
 Учёт доходов и расходов: интерфейс из лабораторной №10–11 перенесён на Next.js (App Router), а Express-сервер заменён Route Handlers внутри `app/api/`. Данные хранятся в Vercel Blob Store `web-course-2026-blob` (JSON), а для локального запуска без токена автоматически используется SQLite.
 
 ## Запуск
