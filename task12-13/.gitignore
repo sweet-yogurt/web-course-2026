@@ -3,5 +3,6 @@ node_modules/
 out/
 .DS_Store
 .env*
+!.env.example
 data/*.sqlite*
 *.log
