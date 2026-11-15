@@ -17,3 +17,14 @@ npm run dev
 - `src/utils/storage.js` — загрузка и сохранение задач в `localStorage`.
 
 Опциональные части (json-server и загрузка с jsonplaceholder) не реализованы: данные хранятся в `localStorage`.
+
+## Тесты
+
+Добавлены в лабораторной №14: Vitest + React Testing Library.
+
+```bash
+npm test
+npm run test:coverage
+```
+
+25 тестов: юнит-тесты `src/utils/todos.test.js` и компонентные тесты `TodoForm`/`TodoItem`. Подробности и отчёт — в [`task14/README.md`](../task14/README.md).
